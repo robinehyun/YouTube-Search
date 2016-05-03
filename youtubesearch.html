@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css">
+    <title>YoutTube AJAX</title>
+  </head>
+  <body>
+    <h1>Search YouTube</h1>
+    <form>
+      <input id="query" type="text" value="" placeholder="Enter Something">
+      <button type="submit">Search</button>
+    </form>
+    <ul id="results"></ul>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery.fancybox.js"></script>
+    <script>
+
+      $('.fancybox').fancybox();
+
+      var embedVid = 'https://www.youtube.com/embed/';
+
+      $('button').click(function(e){
+        e.preventDefault();
+
+        //Get value of the query
+        var query = $('#query').val();
+        //If query is not blank
+        if(query !== ""){
+          $.ajax({
+            method: "GET",
+            url: 'https://www.googleapis.com/youtube/v3/search/',
+            data:{part:'snippet', key:'AIzaSyBuCS9s08XU1xLNVjGyRNo-lrmJzsdvPIY', q:query}
+          }).done(function(data){
+              console.log(data);
+              var items = data.items;
+              console.log(items);
+              items.forEach(function(item){
+                var vidID = item.id.videoId;
+                var title = item.snippet.title;
+                var thumbnail = item.snippet.thumbnails.high.url;
+                var results = $('#results');
+
+                results.append("<li>"+title
+						+ "<br><a class='fancybox fancybox.iframe' href='"+embedVid+vidID+"?autoplay=1'><img src='"+thumbnail+"'></a>"
+						+"</li>");
+              });
+          }).fail(function(){
+            console.log('AJAX request failed');
+          });
+        } else {
+          alert('Please enter a search query!');
+        }
+
+      });
+
+    </script>
+  </body>
+</html>
